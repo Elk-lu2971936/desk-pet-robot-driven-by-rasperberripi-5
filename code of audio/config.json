@@ -1,0 +1,73 @@
+[
+    {
+        "text": [
+            "hi."
+        ],
+        "code": "0x01"
+    },
+    {
+        "text": [
+            "up.",
+            "up?",
+            "oh.",
+            "ow.",
+            "ah.",
+            "wow."
+        ],
+        "code": "0x02"
+    },
+    {
+        "text": [
+            "How are you?",
+            "okay.",
+            "okay",
+            "okay?",
+            "okay!"
+        ],
+        "code": "0x03"
+    },
+    {
+        "text": [
+            "correct.",
+            "Roach.",
+            "crumbs.",
+            "Close.",
+            "Crows.",
+            "Croats.",
+            "Brows.",
+            "Roast.",
+            "Crocs",
+            "Crocs.",
+            "Gross.",
+            "Cross.",
+            "Girls.",
+            "Crotch.",
+            "roads.",
+            "Croak.",
+            "rose"
+        ],
+        "code": "0x04"
+    },
+    {
+        "text": [
+            "salip.",
+            "sleep.",
+            "SABI!",
+            "Salib.",
+            "Sadeep.",
+            "Sabeep.",
+            "S'vip.",
+            "Salim.",
+            "Stay perfect.",
+            ""
+        ],
+        "code": "0x05"
+    },
+    {
+        "text": [
+            "Stand up.",
+            "Stand off."
+        ],
+        "code": "0x06"
+    }
+]
