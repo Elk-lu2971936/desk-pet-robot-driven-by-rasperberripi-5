@@ -22,7 +22,8 @@ cmake --build build --config Release
 📌Test if Whisper is working correctly
 If Whisper runs successfully, the installation is complete 🎉.
 
-🚀 2. Run This Project
+## **🚀 2. Run This Project`**
+
 1️⃣ Compile the project
 
 mkdir build
