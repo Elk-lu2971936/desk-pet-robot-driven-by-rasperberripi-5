@@ -89,4 +89,3 @@ Execute the following command:
 
 This project includes [`json.hpp`](https://github.com/nlohmann/json) from the **JSON for Modern C++** library.  
 It provides a modern, easy-to-use JSON parser for C++.
-..........
