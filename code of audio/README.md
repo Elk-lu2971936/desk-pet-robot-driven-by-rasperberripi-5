@@ -84,6 +84,3 @@ Execute the following command:
 - ✅ Display the recognized text  
 
 ---
-
-## 🎯 **This README is fully formatted for GitHub!**  
-🚀 **All sections now have consistent Markdown styling, correct line breaks, and improved readability.**  
