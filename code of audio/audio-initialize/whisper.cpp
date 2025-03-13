@@ -105,7 +105,7 @@ int voice_to_text(const char* voice_file, std::string& text)
             text = trim(text);
             LOG_DBG("Text: %s", text.c_str());
         } else {
-            std::cout << "text 字段为空或不存在, response: " << response << std::endl;
+            std::cout << "text The field is empty or does not exist, response: " << response << std::endl;
         }
     } catch (const json::parse_error& e) {
         std::string err = e.what();
