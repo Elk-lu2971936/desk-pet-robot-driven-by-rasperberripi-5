@@ -84,3 +84,8 @@ Execute the following command:
 - ✅ Display the recognized text  
 
 ---
+
+## 📌 JSON Support
+
+This project includes [`json.hpp`](https://github.com/nlohmann/json) from the **JSON for Modern C++** library.  
+It provides a modern, easy-to-use JSON parser for C++.
