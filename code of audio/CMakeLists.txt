@@ -8,7 +8,7 @@ project(whisper)
 set(CMAKE_CXX_STANDARD 11)
 
 # Find all the.cpp files and add them to the source file list
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES "audio-initialize/*.cpp")
 
 # Set the search path for header files
 include_directories(/usr/include/x86_64-linux-gnu/)
