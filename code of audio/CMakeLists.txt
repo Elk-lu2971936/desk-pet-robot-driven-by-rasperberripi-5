@@ -1,24 +1,24 @@
-# CMake最低版本要求
+# CMake Minimum version requirements
 cmake_minimum_required(VERSION 3.10)
 
-# 项目名称
+# Project name
 project(whisper)
 
-# 设置 C++ 标准
+# Setting C++ standards
 set(CMAKE_CXX_STANDARD 11)
 
-# 查找所有的 .cpp 文件并将它们添加到源文件列表中
+# Find all the.cpp files and add them to the source file list
 file(GLOB SOURCES "src/*.cpp")
 
-# 设置头文件搜索路径
+# Set the search path for header files
 include_directories(/usr/include/x86_64-linux-gnu/)
 
-# 设置库文件搜索路径
+# Set the search path for library files
 link_directories(/usr/lib/x86_64-linux-gnu/)
 
-# 创建可执行文件
+# Create an executable file
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-# 链接 .so 文件
+# Link to the.so file
 target_link_libraries(${PROJECT_NAME} curl)
 
