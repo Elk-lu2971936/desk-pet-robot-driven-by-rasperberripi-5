@@ -85,6 +85,13 @@ Execute the following command:
 
 ---
 
+## 📌 JSON Support
+
+This project includes [`json.hpp`](https://github.com/nlohmann/json) from the **JSON for Modern C++** library.  
+It provides a modern, easy-to-use JSON parser for C++.
+
+---
+
 ⚠️ Upcoming Changes & New Version Plan
 
 Important Notice:
@@ -105,9 +112,3 @@ Key Improvements in the New Version:
 
 We will develop this optimized version in a new branch soon. Stay tuned! 🚀
 
-
-
-## 📌 JSON Support
-
-This project includes [`json.hpp`](https://github.com/nlohmann/json) from the **JSON for Modern C++** library.  
-It provides a modern, easy-to-use JSON parser for C++.
