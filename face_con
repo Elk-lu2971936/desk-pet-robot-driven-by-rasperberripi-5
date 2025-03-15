@@ -15,12 +15,12 @@
 #define PAGE_COUNT (SCREEN_HEIGHT / 8)
 
 // Expression code definition
-#define EXP_SLEEP       0x01  // 睡觉
-#define EXP_WIDE_EYES   0x02  // 瞪大眼
-#define EXP_HAPPY       0x03  // 快乐
-#define EXP_FRENZIED    0x04  // 狂热
-#define EXP_VERY_HAPPY  0x05  // 非常快乐
-#define EXP_GREETING    0x06  // 打招呼
+#define EXP_SLEEP       0x01  // sleep
+#define EXP_WIDE_EYES   0x02  // Eyes wide open
+#define EXP_HAPPY       0x03  // hapiness
+#define EXP_FRENZIED    0x04  // Frenzy
+#define EXP_VERY_HAPPY  0x05  // Very happy
+#define EXP_GREETING    0x06  // Say hello
 
 // Send a single command to the OLED
 void sendCommand(int file, uint8_t cmd) {
