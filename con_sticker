@@ -14,29 +14,29 @@
 #define SCREEN_HEIGHT 64
 #define PAGE_COUNT (SCREEN_HEIGHT / 8)
 
-// 表情代码定义
-#define EXP_SLEEP       0x01  // 睡觉
-#define EXP_WIDE_EYES   0x02  // 瞪大眼
-#define EXP_HAPPY       0x03  // 快乐
-#define EXP_FRENZIED    0x04  // 狂热
-#define EXP_VERY_HAPPY  0x05  // 非常快乐
-#define EXP_GREETING    0x06  // 打招呼
+// Expression code definition
+#define EXP_SLEEP       0x01  // sleep
+#define EXP_WIDE_EYES   0x02  // Eyes wide open
+#define EXP_HAPPY       0x03  // hapiness
+#define EXP_FRENZIED    0x04  // Frenzy
+#define EXP_VERY_HAPPY  0x05  // Very happy
+#define EXP_GREETING    0x06  // Say hello
 
-// 发送单个命令到OLED
+// Send a single command to the OLED
 void sendCommand(int file, uint8_t cmd) {
     uint8_t buffer[2] = {0x00, cmd};
     write(file, buffer, 2);
 }
 
-// 发送一块数据到OLED（例如一页的数据）
+// Send a block of data to the OLED 
 void sendData(int file, const uint8_t* data, size_t length) {
     uint8_t buffer[length + 1];
-    buffer[0] = 0x40;  // 数据模式控制字
+    buffer[0] = 0x40;  //Data mode control word
     memcpy(&buffer[1], data, length);
     write(file, buffer, length + 1);
 }
 
-// 设置或清除缓冲区中的一个像素
+// Set or clear a pixel in the buffer
 void setPixel(uint8_t* buffer, int x, int y, bool on) {
     if (x < 0 || x >= SCREEN_WIDTH || y < 0 || y >= SCREEN_HEIGHT)
         return;
@@ -49,8 +49,8 @@ void setPixel(uint8_t* buffer, int x, int y, bool on) {
 }
 
 /*
- * 生成笑脸（微笑）图案数据，参考第一段代码：
- * 先绘制一个圆形脸，然后清除眼睛和嘴巴区域
+* Generate smiley face pattern data, refer to the first code:
+* First draw a circular face, then clear the eyes and mouth areas
  */
 void generateSmiley(uint8_t* buffer) {
     memset(buffer, 0, PAGE_COUNT * SCREEN_WIDTH);
@@ -63,7 +63,7 @@ void generateSmiley(uint8_t* buffer) {
     int right_eye_cx = center_x + 12;
     int right_eye_cy = center_y - 8;
     
-    // 绘制圆形脸
+    // Draw a round face
     for (int y = 0; y < SCREEN_HEIGHT; ++y) {
         for (int x = 0; x < SCREEN_WIDTH; ++x) {
             bool pixel = false;
@@ -71,7 +71,7 @@ void generateSmiley(uint8_t* buffer) {
             int dy = y - center_y;
             if (dx * dx + dy * dy <= face_radius * face_radius)
                 pixel = true;
-            // 擦除眼睛区域
+           // Erase the eye area
             int dx_eye = x - left_eye_cx;
             int dy_eye = y - left_eye_cy;
             if (dx_eye * dx_eye + dy_eye * dy_eye <= eye_radius * eye_radius)
@@ -80,7 +80,7 @@ void generateSmiley(uint8_t* buffer) {
             dy_eye = y - right_eye_cy;
             if (dx_eye * dx_eye + dy_eye * dy_eye <= eye_radius * eye_radius)
                 pixel = false;
-            // 嘴巴：在脸下部擦除两条水平线
+            // Mouth: Erase two horizontal lines at the bottom of the face
             if ((y == center_y + 10 || y == center_y + 11) && (x >= center_x - 10 && x <= center_x + 10))
                 pixel = false;
             if (pixel)
@@ -90,19 +90,19 @@ void generateSmiley(uint8_t* buffer) {
 }
 
 /*
- * 根据传入的表情 code 生成对应图案数据
- * 表情定义：
- * 0x01：睡觉
- * 0x02：瞪大眼
- * 0x03：快乐
- * 0x04：狂热
- * 0x05：非常快乐
- * 0x06：打招呼
+* Generate corresponding pattern data according to the incoming expression code
+* Expression definition:
+* 0x01: Sleeping
+* 0x02: Wide-eyed
+* 0x03: Happy
+* 0x04: Crazy
+* 0x05: Very happy
+* 0x06: Greeting
  */
 void generateExpression(uint8_t* buffer, uint8_t expr) {
     memset(buffer, 0, PAGE_COUNT * SCREEN_WIDTH);
     
-    // 基本脸部参数
+    // Basic facial parameters
     int center_x = SCREEN_WIDTH / 2;   // 64
     int center_y = SCREEN_HEIGHT / 2;    // 32
     int face_radius = 28;
@@ -111,7 +111,7 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
     int right_eye_cx = center_x + 12;
     int right_eye_cy = center_y - 8;
     
-    // 绘制圆形脸
+    // Draw a round face
     for (int y = 0; y < SCREEN_HEIGHT; ++y) {
         for (int x = 0; x < SCREEN_WIDTH; ++x) {
             int dx = x - center_x;
@@ -121,19 +121,19 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
         }
     }
     
-    // 根据不同表情擦除眼睛和嘴巴区域
+    // Erase the eyes and mouth areas according to different expressions
     if (expr == EXP_SLEEP) {
-        // 睡觉：眼睛用水平线表示闭眼
+        // Sleep: eyes are closed with horizontal lines
         for (int x = left_eye_cx - 3; x <= left_eye_cx + 3; ++x)
             setPixel(buffer, x, left_eye_cy, false);
         for (int x = right_eye_cx - 3; x <= right_eye_cx + 3; ++x)
             setPixel(buffer, x, right_eye_cy, false);
-        // 嘴巴：简单水平线
+        // Mouth: simple horizontal line
         for (int x = center_x - 5; x <= center_x + 5; ++x)
             setPixel(buffer, x, center_y + 10, false);
     }
     else if (expr == EXP_WIDE_EYES) {
-        // 瞪大眼：用大圆（半径5）擦除眼睛区域
+        // Stare: Use a large circle (radius 5) to erase the eye area
         for (int y = 0; y < SCREEN_HEIGHT; ++y) {
             for (int x = 0; x < SCREEN_WIDTH; ++x) {
                 int dx = x - left_eye_cx;
@@ -146,7 +146,7 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
                     setPixel(buffer, x, y, false);
             }
         }
-        // 嘴巴：用小圆（半径2）表示张开的小嘴
+        // Mouth: Use a small circle (radius 2) to represent an open mouth
         for (int y = center_y + 10 - 2; y <= center_y + 10 + 2; ++y) {
             for (int x = center_x - 2; x <= center_x + 2; ++x) {
                 int dx = x - center_x;
@@ -157,7 +157,7 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
         }
     }
     else if (expr == EXP_HAPPY) {
-        // 快乐：标准眼睛（半径3）
+        // Happy: Standard eyes (radius 3)
         for (int y = 0; y < SCREEN_HEIGHT; ++y) {
             for (int x = 0; x < SCREEN_WIDTH; ++x) {
                 int dx = x - left_eye_cx;
@@ -170,14 +170,14 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
                     setPixel(buffer, x, y, false);
             }
         }
-        // 嘴巴：两条水平线近似微笑曲线
+        // Mouth: Two horizontal lines approximating the smile curve
         for (int x = center_x - 10; x <= center_x + 10; ++x) {
             setPixel(buffer, x, center_y + 10, false);
             setPixel(buffer, x, center_y + 11, false);
         }
     }
     else if (expr == EXP_FRENZIED) {
-        // 狂热：眼睛稍大（半径4）
+        // Frenzy: eyes slightly larger (radius 4)
         for (int y = 0; y < SCREEN_HEIGHT; ++y) {
             for (int x = 0; x < SCREEN_WIDTH; ++x) {
                 int dx = x - left_eye_cx;
@@ -190,14 +190,14 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
                     setPixel(buffer, x, y, false);
             }
         }
-        // 嘴巴：擦除较大矩形区域
+        // Mouth: Erase the larger rectangular area
         for (int y = center_y + 9; y <= center_y + 13; ++y) {
             for (int x = center_x - 12; x <= center_x + 12; ++x)
                 setPixel(buffer, x, y, false);
         }
     }
     else if (expr == EXP_VERY_HAPPY) {
-        // 非常快乐：眼睛依然为标准（半径3）
+        // Very happy: eyes are still standard (radius 3)
         for (int y = 0; y < SCREEN_HEIGHT; ++y) {
             for (int x = 0; x < SCREEN_WIDTH; ++x) {
                 int dx = x - left_eye_cx;
@@ -210,14 +210,14 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
                     setPixel(buffer, x, y, false);
             }
         }
-        // 嘴巴：比快乐表情更宽的笑容
+       // Mouth: A wider smile than a happy expression
         for (int x = center_x - 15; x <= center_x + 15; ++x) {
             setPixel(buffer, x, center_y + 9, false);
             setPixel(buffer, x, center_y + 10, false);
         }
     }
     else if (expr == EXP_GREETING) {
-        // 打招呼：左眼标准，右眼眨眼（用水平线表示）
+        // Greeting: standard left eye, wink right eye (indicated by a horizontal line)
         for (int y = 0; y < SCREEN_HEIGHT; ++y) {
             for (int x = 0; x < SCREEN_WIDTH; ++x) {
                 int dx = x - left_eye_cx;
@@ -226,60 +226,60 @@ void generateExpression(uint8_t* buffer, uint8_t expr) {
                     setPixel(buffer, x, y, false);
             }
         }
-        // 右眼：水平线表示眨眼
+        // Right eye: horizontal line indicates blinking
         for (int x = right_eye_cx - 3; x <= right_eye_cx + 3; ++x)
             setPixel(buffer, x, right_eye_cy, false);
-        // 嘴巴：温和微笑
+        // Mouth: Gentle smile
         for (int x = center_x - 8; x <= center_x + 8; ++x)
             setPixel(buffer, x, center_y + 10, false);
     }
 }
 
-// 将缓冲区数据按页写入OLED
+// Write buffer data to OLED page by page
 void drawBuffer(int file, const uint8_t* buffer) {
     for (uint8_t page = 0; page < PAGE_COUNT; ++page) {
-        sendCommand(file, 0xB0 + page);  // 设置页地址
-        sendCommand(file, 0x00);         // 设置低列地址
-        sendCommand(file, 0x10);         // 设置高列地址
+        sendCommand(file, 0xB0 + page);  // Set the page address
+        sendCommand(file, 0x00);         // Set the low column address
+        sendCommand(file, 0x10);         // Set the high column address
         sendData(file, &buffer[page * SCREEN_WIDTH], SCREEN_WIDTH);
     }
 }
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "用法: " << argv[0] << " <表情代码 (0x01~0x06)>" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <Emoji Code (0x01~0x06)>" << std::endl;
         return 1;
     }
     uint8_t exprCode = std::strtoul(argv[1], nullptr, 0);
     if (exprCode < EXP_SLEEP || exprCode > EXP_GREETING) {
-        std::cerr << "无效的表情代码，请使用 0x01~0x06" << std::endl;
+        std::cerr << "Invalid emoji code, please use 0x01~0x06" << std::endl;
         return 1;
     }
     
-    // 打开I2C设备并设置OLED地址
+    // Open the I2C device and set the OLED address
     int file = open("/dev/i2c-1", O_RDWR);
     if (file < 0) {
-        std::cerr << "无法打开I2C设备" << std::endl;
+        std::cerr << "Unable to open I2C device" << std::endl;
         return 1;
     }
     if (ioctl(file, I2C_SLAVE, OLED_ADDR) < 0) {
-        std::cerr << "无法与OLED通信" << std::endl;
+        std::cerr << "Unable to communicate with OLED" << std::endl;
         close(file);
         return 1;
     }
     
     uint8_t display_buffer[PAGE_COUNT * SCREEN_WIDTH];
     
-    // 根据传入的表情代码生成对应表情并显示 5 秒
+    // Generate the corresponding expression according to the passed expression code and display it for 5 seconds
     generateExpression(display_buffer, exprCode);
     drawBuffer(file, display_buffer);
     std::this_thread::sleep_for(std::chrono::seconds(5));
     
-    // 重置为笑脸（微笑）表情并持续显示
+    // Reset to the smiley face (smile) expression and keep it displayed
     generateSmiley(display_buffer);
     drawBuffer(file, display_buffer);
     
-    // 持续显示笑脸表情，直到程序终止
+    // Continue to display the smiley face until the program terminates
     while (true) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
