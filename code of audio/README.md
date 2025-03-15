@@ -85,6 +85,28 @@ Execute the following command:
 
 ---
 
+⚠️ Upcoming Changes & New Version Plan
+
+Important Notice:
+
+This version of the project is only a reference implementation. It relies on a separate Whisper server (whisper-server), which communicates via HTTP requests. While functional, this approach introduces additional overhead due to network communication.
+
+🚀 New Version in Development
+
+To improve efficiency, we are working on a new version that directly integrates Whisper in C++, eliminating the need for an HTTP server.
+
+Key Improvements in the New Version:
+
+⚡ Direct Whisper API Calls (No HTTP communication, reducing latency)
+
+🎤 Real-time Speech-to-Text Processing
+
+📈 Better Performance and Lower Overhead
+
+We will develop this optimized version in a new branch soon. Stay tuned! 🚀
+
+
+
 ## 📌 JSON Support
 
 This project includes [`json.hpp`](https://github.com/nlohmann/json) from the **JSON for Modern C++** library.  
