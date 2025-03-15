@@ -210,7 +210,7 @@ void drawExpression(int file, const uint8_t* buffer) {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << "用法: " << argv[0] << " <Sticker Code (0x01~0x06)>" << std::endl;
+        std::cerr << "usage: " << argv[0] << " <Sticker Code (0x01~0x06)>" << std::endl;
         return 1;
     }
     uint8_t exprCode = std::strtoul(argv[1], nullptr, 0);
@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) {
     }
   // Set the OLED I2C address
     if (ioctl(file, I2C_SLAVE, OLED_ADDR) < 0) {
-        std::cerr << "无法与OLED通信" << std::endl;
+        std::cerr << "Unable to communicate with OLED" << std::endl;
         close(file);
         return 1;
     }
