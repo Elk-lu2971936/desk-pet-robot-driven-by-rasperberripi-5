@@ -1,1 +1,14 @@
+# 原有的基础配置
+cmake_minimum_required(VERSION 3.10)
+project(audio_project)
 
+set(CMAKE_CXX_STANDARD 11)
+
+# 查找 PortAudio
+find_package(PortAudio REQUIRED)
+
+# 添加可执行文件
+add_executable(audio_project main.cpp microphoneInitialize.cpp whilsper.cpp)
+
+# 链接 PortAudio 库
+target_link_libraries(audio_project PRIVATE PortAudio::PortAudio)
