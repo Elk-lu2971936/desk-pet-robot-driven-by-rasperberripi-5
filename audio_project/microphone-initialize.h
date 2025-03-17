@@ -1,6 +1,5 @@
 #pragma once
-
-#include <portaudio.h>
+#include <vector>
 
 // Initialize the microphone
 bool initMicrophone();
