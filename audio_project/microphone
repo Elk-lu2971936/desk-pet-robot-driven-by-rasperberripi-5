@@ -1,0 +1,5 @@
+#pragma once
+#include <vector>
+
+bool initMicrophone();
+std::vector<float> recordAudio(size_t numSamples, int sampleRate, int channels);
