@@ -1,4 +1,7 @@
 #pragma once
+#include <cstddef>       
+#include <vector>
+#include <portaudio.h>
 #include <vector>
 
 // Initialize the microphone
