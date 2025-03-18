@@ -8,11 +8,11 @@
 #include <cassert>
 
 // =============================================================
-// 1) WAV 读取 (16-bit单声道)
+// 1) WAV read (16-bit mono)
 // =============================================================
 struct WavData {
     int sampleRate;
-    std::vector<double> samples; // 存放音频数据(浮点)
+    std::vector<double> samples; //Store audio data (floating point)
 };
 
 bool readMonoWav16(const std::string &filename, WavData &outData) {
@@ -22,7 +22,7 @@ bool readMonoWav16(const std::string &filename, WavData &outData) {
         return false;
     }
 
-    // 简易地跳过 RIFF 头并读取格式，假设必然是 16-bit 单声道
+   // Simply skip the RIFF header and read the format, assuming it must be 16-bit mono
     char riff[4];
     ifs.read(riff, 4); // "RIFF"
     if (!ifs.good()) { std::cerr << "Invalid WAV header.\n"; return false; }
@@ -31,7 +31,7 @@ bool readMonoWav16(const std::string &filename, WavData &outData) {
     char wave[4];
     ifs.read(wave, 4); // "WAVE"
 
-    // 查找 "fmt " subchunk
+   // Search "fmt " subchunk
     char fmt[4];
     uint32_t subchunk1Size;
     ifs.read(fmt, 4); // "fmt "
@@ -47,12 +47,12 @@ bool readMonoWav16(const std::string &filename, WavData &outData) {
     ifs.read(reinterpret_cast<char*>(&blockAlign), 2);
     ifs.read(reinterpret_cast<char*>(&bitsPerSample), 2);
 
-    // 跳过可能有的 "extra param"
+   // Skip possible "extra param"
     if (subchunk1Size > 16) {
         ifs.ignore(subchunk1Size - 16);
     }
 
-    // 找到 "data" subchunk
+// Find the "data" subchunk
     char dataHeader[4];
     uint32_t dataSize = 0;
     while (true) {
@@ -70,7 +70,7 @@ bool readMonoWav16(const std::string &filename, WavData &outData) {
         }
     }
 
-    // 读音频数据
+  // Read audio data
     outData.sampleRate = sampleRate;
     size_t numSamples = dataSize / (bitsPerSample/8) / numChannels;
     outData.samples.resize(numSamples);
@@ -78,30 +78,30 @@ bool readMonoWav16(const std::string &filename, WavData &outData) {
     for (size_t i = 0; i < numSamples; i++) {
         int16_t tmp;
         ifs.read(reinterpret_cast<char*>(&tmp), 2);
-        // 只取单声道 (numChannels=1 假设)
+// Only take single channel (numChannels=1 assumption)
         outData.samples[i] = static_cast<double>(tmp) / 32768.0;
     }
     return true;
 }
 
 // =============================================================
-// 2) 简易MFCC提取
-//    - 分帧(25ms, 10ms移)
-//    - Hamming窗
-//    - 计算能量谱
-//    - Mel滤波(简化), 取26个滤波器
-//    - 对数/ DCT 取前13个系数
+// 2) Simple MFCC extraction
+// - Frame division (25ms, 10ms shift)
+// - Hamming window
+// - Calculate energy spectrum
+// - Mel filter (simplified), take 26 filters
+// - Logarithm / DCT take the first 13 coefficients
 // =============================================================
 
-// 计算汉明窗
+// Calculate the Hamming window
 inline double hamming(size_t n, size_t N) {
     return 0.54 - 0.46 * cos((2.0 * M_PI * n) / (N - 1));
 }
 
-// 简易 FFT 用于得到幅度谱(可以换成更高效的库)
+// Simple FFT is used to obtain the amplitude spectrum (can be replaced with a more efficient library)
 static void naiveDFT(const std::vector<double> &in, std::vector<double> &outReal, std::vector<double> &outImag) {
     // out[k] = sum_{n=0..N-1} in[n]* exp(-j2pi k n / N)
-    // 这里只做非常朴素的 O(N^2)
+// Here we only do a very simple O(N^2)
     int N = (int)in.size();
     outReal.resize(N);
     outImag.resize(N);
@@ -117,16 +117,16 @@ static void naiveDFT(const std::vector<double> &in, std::vector<double> &outReal
     }
 }
 
-// Mel -> 频率
+// Mel -> frequency
 inline double melToHz(double mel) {
     return 700.0 * (exp(mel / 1127.0) - 1.0);
 }
-// 频率 -> Mel
+// frequency -> Mel
 inline double hzToMel(double hz) {
     return 1127.0 * log(1.0 + hz / 700.0);
 }
 
-// 简单 DCT 用于倒谱
+// Simple DCT for cepstrum
 static std::vector<double> dct(const std::vector<double> &in) {
     int N = (int)in.size();
     std::vector<double> out(N, 0.0);
@@ -141,33 +141,33 @@ static std::vector<double> dct(const std::vector<double> &in) {
 }
 
 std::vector<std::vector<double>> computeMFCC(const std::vector<double> &audio, int sampleRate) {
-    // 1) 分帧: 25ms, 10ms移
+// 1) Frame: 25ms, 10ms shift
     int frameLen = (int)(0.025 * sampleRate); // 25ms
     int frameShift = (int)(0.01 * sampleRate); // 10ms
-    // 这里做最简单的: 不做预加重, 不做端点检测
+// Here is the simplest one: no pre-emphasis, no endpoint detection
 
     std::vector<std::vector<double>> mfccResult;
 
-    // Mel 滤波器数量
+//Number of Mel filters
     const int nMel = 26;
-    // MFCC取前13个
+// Take the first 13 MFCCs
     const int nMFCC = 13;
 
-    // 计算Mel滤波器的边界
+// Calculate the boundaries of the Mel filter
     double melMin = hzToMel(0.0);
     double melMax = hzToMel(sampleRate / 2.0);
     std::vector<double> melPoints(nMel+2);
     for (int i = 0; i < nMel+2; i++) {
         melPoints[i] = melMin + (melMax - melMin) * i / (nMel+1);
     }
-    // 转成Hz
+// Convert to Hz
     std::vector<double> binHz(nMel+2);
     for (int i = 0; i < (int)binHz.size(); i++) {
         binHz[i] = melToHz(melPoints[i]);
     }
-    // 转成FFT bin 索引(假设frameLen点FFT)
-    // 只演示: 直接对 frameLen 做 naiveDFT
-    // 实际中通常是下一个2^N大小
+// Convert to FFT bin index (assuming frameLen point FFT)
+// Demonstration only: do naiveDFT directly on frameLen
+// In practice, it is usually the next 2^N size
     auto freqToBin = [&](double freq){
         return (int)std::floor((frameLen)* freq / sampleRate);
     };
@@ -177,24 +177,24 @@ std::vector<std::vector<double>> computeMFCC(const std::vector<double> &audio, i
     }
 
     for (int start = 0; start + frameLen <= (int)audio.size(); start += frameShift) {
-        // 2) 取出一帧并加窗
+// 2) Take out a frame and add a window
         std::vector<double> frame(frameLen);
         for (int i = 0; i < frameLen; i++) {
             frame[i] = audio[start + i] * hamming(i, frameLen);
         }
 
-        // 3) DFT -> 幅度谱
+// 3) DFT -> Amplitude Spectrum
         std::vector<double> re, im;
         naiveDFT(frame, re, im);
-        // 只取 0..frameLen/2
+// Only take 0..frameLen/2
         int half = frameLen/2;
         std::vector<double> powerSpec(half+1);
         for (int k = 0; k <= half; k++) {
             double mag = re[k]*re[k] + im[k]*im[k];
-            powerSpec[k] = mag; // 或者再除以 frameLen
+            powerSpec[k] = mag; // Or divide by frameLen
         }
 
-        // 4) Mel滤波 -> 26维
+// 4) Mel filter -> 26 dimensions
         std::vector<double> melEnergies(nMel, 0.0);
         for (int m = 1; m <= nMel; m++) {
             int startBin = binIndices[m-1];
@@ -211,14 +211,14 @@ std::vector<std::vector<double>> computeMFCC(const std::vector<double> &audio, i
                 melEnergies[m-1] += powerSpec[k] * weight;
             }
         }
-        // 对数
+ // Logarithm
         for (int m = 0; m < nMel; m++) {
             melEnergies[m] = std::log10(std::max(melEnergies[m], 1e-10));
         }
-        // 5) DCT -> 取前13
-        // 这里把 melEnergies.size()=26 => 进行26点DCT, 返回26维
+// 5) DCT -> take the first 13
+        // Here melEnergies.size()=26 => perform 26-point DCT, return 26-dimensional
         auto dctOut = dct(melEnergies);
-        dctOut.resize(nMFCC); // 截取前13
+        dctOut.resize(nMFCC); // Intercept the first 13
         mfccResult.push_back(dctOut);
     }
     return mfccResult;
@@ -255,7 +255,7 @@ double dtwDistance(const std::vector<std::vector<double>> &seq1,
 }
 
 // =============================================================
-// 主函数：
+// Main function:
 // usage: ./minimal ref1.wav label1 ref2.wav label2 ref3.wav label3 ref4.wav label4 input.wav
 // =============================================================
 int main(int argc, char* argv[]) {
@@ -265,10 +265,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // 解析命令行, 最后一个参数是输入音频, 之前的是 pairs(refWav, label)
-    // 假设我们要加载N对： (ref.wav, label), 最后一条是 input.wav
-    // 例如: ArgCount = 9 => (4对reference + 1输入)
-    // Layout: [RefWav Label], [RefWav Label], ..., [InputWav]
+// Parse the command line, the last parameter is the input audio, the previous one is pairs(refWav, label)
+// Assume we want to load N pairs: (ref.wav, label), the last one is input.wav
+// For example: ArgCount = 9 => (4 reference pairs + 1 input)
+// Layout: [RefWav Label], [RefWav Label], ..., [InputWav]
 
     int numRefs = (argc - 2) / 2;
     // example: if argc=9 => (9-2)/2=3.5 => 3 pairs => indices=1~6 => last index=7 => input
@@ -280,7 +280,7 @@ int main(int argc, char* argv[]) {
     }
     std::string inputFile = argv[2*numRefs+1];
 
-    // 读取参考音频并提取MFCC
+   // Read reference audio and extract MFCC
     std::vector<std::vector<std::vector<double>>> refMfccs(numRefs);
     std::cout << "Loading references...\n";
     for (int i = 0; i < numRefs; i++) {
@@ -294,7 +294,7 @@ int main(int argc, char* argv[]) {
                   << "\", frames=" << mfcc.size() << std::endl;
     }
 
-    // 读取输入音频
+    // Read input audio
     std::cout << "Loading input: " << inputFile << std::endl;
     WavData inWav;
     if (!readMonoWav16(inputFile, inWav)) {
@@ -303,7 +303,7 @@ int main(int argc, char* argv[]) {
     auto inMfcc = computeMFCC(inWav.samples, inWav.sampleRate);
     std::cout << "  input frames=" << inMfcc.size() << std::endl;
 
-    // DTW匹配
+   // DTW matching
     double bestDist = std::numeric_limits<double>::infinity();
     std::string bestLabel = "Unrecognized";
     for (int i = 0; i < numRefs; i++) {
@@ -315,7 +315,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // 设置个简单阈值
+    // Set a simple threshold
     if (bestDist > 1800.0) {
         std::cout << "Result: Unrecognized (distance " << bestDist << ")\n";
     } else {
