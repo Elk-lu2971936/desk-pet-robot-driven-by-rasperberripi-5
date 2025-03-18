@@ -1,28 +1,13 @@
-# Original basic configuration
-cmake_minimum_required(VERSION 3.5)
-project(MyLocalWhisperDemo)
+cmake_minimum_required(VERSION 3.10)
+project(minimal_mfcc_dtw)
 
-set(CMAKE_CXX_STANDARD 14)
+# Specify the C++11 standard and require the compiler to support it
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2")
 
-# Find PortAudio
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
-find_package(Threads REQUIRED)
+# Add executable file (minimal_mfcc_dtw.cpp is source code file)
+add_executable(minimal minimal_mfcc_dtw.cpp)
 
-# Add executable file
-add_executable(myRecorder
-    main.cpp
-    microphoneInitialize.cpp
-    whisper/src/whisper.cpp
-    whisper/ggml/src/ggml.c
-    # whisper/k_quants.cpp     
-)
-# Link the PortAudio library
-target_include_directories(myRecorder PRIVATE
-    ${PORTAUDIO_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/whisper/src   
-
-target_link_libraries(myRecorder PRIVATE
-    ${PORTAUDIO_LIBRARIES}
-    Threads::Threads
-)
+# Link the math library libm (if the math function library is needed to use)
+target_link_libraries(minimal m)
