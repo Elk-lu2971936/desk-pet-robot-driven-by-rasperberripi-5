@@ -72,6 +72,24 @@ cmake --build build
 ]
 ```
 
+## Included Libraries
+
+This project uses the following open-source components:
+
+- [whisper.cpp](https://github.com/ggerganov/whisper.cpp) — MIT License  
+  Used for on-device real-time speech recognition.
+
+- [nlohmann/json](https://github.com/nlohmann/json) — MIT License  
+  Single-header JSON parser used to load the command configuration.
+
+All third-party libraries remain under their respective licenses.
+
+## Model Disclaimer
+
+The Whisper models used in this project are developed and released by OpenAI.  
+Model binaries must be downloaded separately from:  
+https://huggingface.co/ggerganov/whisper.cpp
+
 ## License
 
 MIT License
