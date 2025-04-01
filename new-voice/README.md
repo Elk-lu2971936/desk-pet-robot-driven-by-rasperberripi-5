@@ -1,4 +1,4 @@
-# Whisper-Fuzzy DeskPet — Voice-Controlled Companion for Raspberry Pi
+# Whisper-Fuzzy DeskPet 
 
 A lightweight, offline-capable voice recognition system using Whisper.cpp and fuzzy matching to control four servos and an OLED screen on a desk pet. Built in C++ for Raspberry Pi.
 
@@ -71,44 +71,6 @@ cmake --build build
   { "text": ["turn left"], "code": "0x10" }
 ]
 ```
-
-## Project Structure
-
-```
-.
-├── main.cpp
-├── whisper_fuzzy.cpp/h
-├── whisper_stream.cpp/h
-├── debug.cpp/h
-├── config.json
-├── json.hpp
-├── build_environment.sh
-├── models/
-├── CMakeLists.txt
-└── README.md
-```
-
-## .gitignore Suggestions
-
-```gitignore
-build/
-models/*.bin
-*.wav
-*.log
-*.o
-*.so
-.vscode/
-.idea/
-```
-
-## Contributors
-
-| Member | Role |
-|--------|------|
-| You | Voice recognition and command matching system |
-| Teammate A | Servo motor control integration |
-| Teammate B | OLED display updates |
-| Teammate C | Desk pet behavior design and testing |
 
 ## License
 
