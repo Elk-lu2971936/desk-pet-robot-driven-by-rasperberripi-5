@@ -53,13 +53,13 @@ cmake --build build --config Release
 #### Mode 1: VAD (Voice Activated)
 
 ```bash
-./build/bin/whisper-fuzzy   -u config.json   -m models/ggml-base.en-q5_1.bin   --step 0 --length 5000 -vth 0.6
+./build/bin/whisper-fuzzy -u ./config.json -m ./whisper.cpp/models/ggml-base.en-q5_1.bin -t 6 --step 0 --length 3000 -vth 0.6
 ```
 
 #### Mode 2: Periodic Recognition (Sliding Window)
 
 ```bash
-./build/bin/whisper-fuzzy   -u config.json   -m models/ggml-base.en-q5_1.bin   --step 1000 --length 3000
+./build/bin/whisper-fuzzy -u ./config.json -m ./whisper.cpp/models/ggml-base.en-q5_1.bin -t 6 --step 1000 --length 3000 -vth 0.6
 ```
 
 ## Configuration File: `config.json`
