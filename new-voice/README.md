@@ -44,8 +44,8 @@ You can replace the model file with others (tiny, small, medium) depending on sp
 ### Step 2: Build the Project
 
 ```bash
-cmake -B build -DWHISPER_SDL2=ON
-cmake --build build
+cmake -B build -DWHISPER_SDL2=ON -DENABLE_GDB=OFF -S whisper.cpp
+cmake --build build --config Release
 ```
 
 ### Step 3: Run the Program
