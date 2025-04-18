@@ -5,21 +5,21 @@
 #include "rotate180.h"
 
 #define GPIO_CHIP   "/dev/gpiochip0"
-#define SERVO_PIN   13  // 舵机控制口：GPIO 13
-#define SERVO_PIN2  12  // 舵机控制口：GPIO 12
+#define SERVO_PIN   13  // Servo control pin: GPIO 13
+#define SERVO_PIN2  12  // Servo control pin: GPIO 12
 
-// PWM 参数设置
-const int PWM_PERIOD_US = 20000;  // 20ms 周期（50Hz）
-const int MIN_PULSE_US   = 1000;   // 1ms 脉宽对应 0°
-const int MAX_PULSE_US   = 2000;   // 2ms 脉宽对应 180°
+// PWM parameter settings
+const int PWM_PERIOD_US = 20000;  // 20ms period (50Hz)
+const int MIN_PULSE_US   = 1000;  // 1ms pulse width = 0°
+const int MAX_PULSE_US   = 2000;  // 2ms pulse width = 180°
 
 /**
- * @brief 输出指定脉宽的 PWM 信号，持续一段时间（单位：毫秒）
+ * @brief Output PWM signal with specified pulse width for a given duration (in milliseconds)
  *
- * @param line 控制的 GPIO 线路
- * @param pulse_width_us 脉宽（单位：微秒）
- * @param period_us PWM 周期（单位：微秒）
- * @param duration_ms 输出持续时间（单位：毫秒）
+ * @param line         Target GPIO line
+ * @param pulse_width_us  Pulse width in microseconds
+ * @param period_us    PWM period in microseconds
+ * @param duration_ms  Total output duration in milliseconds
  */
 void generate_pwm(gpiod_line* line, int pulse_width_us, int period_us, int duration_ms) {
     auto start_time = std::chrono::steady_clock::now();
@@ -39,9 +39,9 @@ void generate_pwm(gpiod_line* line, int pulse_width_us, int period_us, int durat
 }
 
 /**
- * @brief 内部公共函数：控制单个伺服电机平滑旋转从 0° 到 180°
+ * @brief Internal function: Smoothly rotate a single servo from 0° to 180°
  *
- * @param servo_pin 指定的 GPIO 管脚号
+ * @param servo_pin  GPIO pin number to control
  */
 void rotateServo180_common(int servo_pin) {
     gpiod_chip* chip = gpiod_chip_open(GPIO_CHIP);
@@ -79,11 +79,11 @@ void rotateServo180_common(int servo_pin) {
 }
 
 /**
- * @brief 内部公共函数：控制单个伺服电机平滑旋转从 180° 到 0°
+ * @brief Internal function: Smoothly rotate a single servo from 180° to 0°
  *
- * 用于 sleep 模式下的舵机归位。
+ * Used to return to home position in sleep mode.
  *
- * @param servo_pin 指定的 GPIO 管脚号
+ * @param servo_pin  GPIO pin number to control
  */
 void rotateServo0_common(int servo_pin) {
     gpiod_chip* chip = gpiod_chip_open(GPIO_CHIP);
@@ -123,12 +123,12 @@ void rotateServo0_common(int servo_pin) {
 }
 
 /**
- * @brief 内部公共函数：控制单个舵机平滑旋转到 90° (move forward 模式)
+ * @brief Internal function: Smoothly rotate a single servo to 90° (move forward mode)
  *
- * 对于 GPIO13 的舵机：从 0° (1000us) 到 90° (1500us)；
- * 对于 GPIO12 的舵机：从 180° (2000us) 到 90° (1500us)。
+ * For GPIO13: from 0° (1000us) to 90° (1500us);
+ * For GPIO12: from 180° (2000us) to 90° (1500us).
  *
- * @param servo_pin 指定的 GPIO 管脚号
+ * @param servo_pin  GPIO pin number to control
  */
 void moveForward_common(int servo_pin) {
     gpiod_chip* chip = gpiod_chip_open(GPIO_CHIP);
@@ -149,7 +149,7 @@ void moveForward_common(int servo_pin) {
     }
 
     int start_pulse, target_pulse;
-    target_pulse = (MIN_PULSE_US + MAX_PULSE_US) / 2;  // 1500us 表示90°
+    target_pulse = (MIN_PULSE_US + MAX_PULSE_US) / 2;  // 1500us represents 90°
     if (servo_pin == SERVO_PIN) {
         start_pulse = MIN_PULSE_US;
         std::cout << "[moveForward] Servo on GPIO " << servo_pin << " moving from 0° to 90°..." << std::endl;
@@ -182,9 +182,9 @@ void moveForward_common(int servo_pin) {
 }
 
 /**
- * @brief 同时控制两个伺服电机实现 move forward 操作：
- *        GPIO13 的舵机平滑从 0° 旋转到 90°；
- *        GPIO12 的舵机平滑从 180° 旋转到 90°。
+ * @brief Control two servos simultaneously to perform move forward:
+ *        GPIO13 moves from 0° to 90°;
+ *        GPIO12 moves from 180° to 90°.
  */
 void moveForward() {
     std::thread servo1(moveForward_common, SERVO_PIN);
@@ -194,7 +194,7 @@ void moveForward() {
 }
 
 /**
- * @brief 同时控制两个伺服电机（GPIO13 与 GPIO12）旋转至 180°
+ * @brief Simultaneously rotate both servos (GPIO13 & GPIO12) to 180°
  */
 void rotateServo180() {
     std::thread servo1(rotateServo180_common, SERVO_PIN);
@@ -204,7 +204,7 @@ void rotateServo180() {
 }
 
 /**
- * @brief 同时控制两个伺服电机（GPIO13 与 GPIO12）旋转回 0° (sleep 模式)
+ * @brief Simultaneously rotate both servos (GPIO13 & GPIO12) back to 0° (sleep mode)
  */
 void rotateServo0() {
     std::thread servo1(rotateServo0_common, SERVO_PIN);
@@ -214,16 +214,15 @@ void rotateServo0() {
 }
 
 /**
- * @brief 交替执行舵机运动：
- *        先使 GPIO12 舵机从 180° 平滑旋转到 90°（利用 moveForward_common 实现），
- *        再使 GPIO13 舵机从 0° 平滑旋转到 180°，
- *        共交替运行 6 个周期。
+ * @brief Alternating servo motion:
+ *        First, GPIO12 moves from 180° to 90° (via moveForward_common),
+ *        Then, GPIO13 moves from 0° to 180°;
+ *        Repeat this cycle 6 times.
  */
 void alternateRotation() {
     for (int i = 0; i < 6; i++) {
         std::cout << "[alternateRotation] Cycle " << (i + 1)
                   << " : GPIO12 rotates forward (from 180° to 90°)" << std::endl;
-        // GPIO12：从 180° 到 90°采用 moveForward_common（仅一次动作）
         moveForward_common(SERVO_PIN2);
         std::cout << "[alternateRotation] Cycle " << (i + 1)
                   << " : GPIO13 rotates backward (from 0° to 180°)" << std::endl;
