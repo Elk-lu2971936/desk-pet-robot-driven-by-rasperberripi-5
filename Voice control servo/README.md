@@ -97,21 +97,4 @@ make -j4
 
 ---
 
-## 🧑‍💻 Team 11 - Desk Pet Project
 
-- Qingyu Lu (2971936L)  
-- Chaoqi Guo (2976693G)  
-- Zeyu Zhao (2984894Z)  
-- Yiyang Zhang (2990718Z)  
-- Hao Zhong (2984282Z)
-
----
-
-## ✅ Project Requirements Met
-
-- [x] Real-time responsiveness  
-- [x] No blocking delay in logic  
-- [x] Callback-based voice command handling  
-- [x] Multithreaded servo control  
-- [x] C++ with object-oriented design  
-- [x] git + GitHub version control  
