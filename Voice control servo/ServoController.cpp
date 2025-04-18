@@ -1,22 +1,33 @@
 #include "ServoController.h"
 #include <thread>
 #include <iostream>
+#include "oled_display.h"
 
 ServoController::ServoController()
-    : left(13, "servo13"), right(12, "servo12") {}
+    : left(13, "servo13"), right(12, "servo12") {
+    initOLED();
+}
 
 ServoController::~ServoController() {
     left.release();
     right.release();
 }
 
+void ServoController::displayStatus(const std::string& status) {
+    if (status == "stand") showStandUp();
+    else if (status == "sleep") showSleep();
+    // Can extend to more states
+}
+
 void ServoController::standUp() {
+    displayStatus("stand");
     std::thread t1([&]() { left.smoothRotateTo(180); });
     std::thread t2([&]() { right.smoothRotateTo(180); });
     t1.join(); t2.join();
 }
 
 void ServoController::sleep() {
+    displayStatus("sleep");
     std::thread t1([&]() { left.smoothRotateTo(0); });
     std::thread t2([&]() { right.smoothRotateTo(0); });
     t1.join(); t2.join();
