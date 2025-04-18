@@ -6,12 +6,13 @@ public:
     ServoController();
     ~ServoController();
 
-    void standUp();         // both to 180°
-    void sleep();           // both to 0°
-    void moveForward();     // both to 90°
-    void alternate();       // forward/backward alternating motion
+    void standUp();
+    void sleep();
+    void moveForward();
+    void alternate();
 
 private:
-    Servo left;   // GPIO 13
-    Servo right;  // GPIO 12
+    Servo left;
+    Servo right;
+    void displayStatus(const std::string& status); // new OLED helper
 };
