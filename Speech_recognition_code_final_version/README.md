@@ -1,99 +1,59 @@
-# Whisper-Fuzzy DeskPet 
+# Whisper-Fuzzy DeskPet — Voice-Controlled Companion for Raspberry Pi
 
-A lightweight, offline-capable voice recognition system using Whisper.cpp and fuzzy matching to control four servos and an OLED screen on a desk pet. Built in C++ for Raspberry Pi.
+A real-time, offline speech recognition system using Whisper.cpp and fuzzy matching, designed for controlling four servo motors and an OLED screen on a Raspberry Pi-based desk pet.
 
-## Project Overview
+## Project Context
 
-This project is a real-time speech recognition system that listens to voice commands, converts them into matching control codes using a `config.json` file, and then triggers actions such as moving servos or updating the OLED screen on a desk pet.
+This project was developed as part of a group coursework. It integrates speech recognition with hardware interaction and demonstrates how to use Whisper.cpp with custom command mapping for embedded systems.
 
-It supports two recognition modes:
-- Sliding window mode (periodic recognition)
-- Voice Activity Detection (VAD) mode (triggered only when someone speaks)
+## 🔄 Project Evolution Notice
+
+This project was originally built on top of `whisper-server`, using an HTTP-based architecture to perform speech recognition.
+
+While functional, that approach introduced unnecessary communication overhead and complexity.
+
+🧠 **This new version** eliminates the HTTP server and instead **integrates Whisper C++ directly into the application** for better efficiency, simplicity, and real-time performance.
+
+### Key Improvements Over the First Version:
+
+- ⚡ No HTTP communication, Whisper runs fully embedded
+- 🎙️ Real-time speech recognition with low latency
+- 🛠️ GPIO servo control triggered instantly after voice match
+- ✅ Easier to deploy and maintain
+
+If you're looking for the original HTTP-based architecture, check out the earlier branch or release tagged `v0.9-http`.
+
+## Overview
+
+- Converts spoken input into matched command codes via a custom `config.json` file
+- Triggers hardware actions via callback (e.g., servo movement, OLED updates)
+- Supports real-time recognition with VAD or periodic recognition modes
+- Modular and lightweight, fully compatible with Raspberry Pi
 
 ## Features
 
-- Real-time, offline voice recognition using Whisper.cpp
-- Customizable text to command code mapping via `config.json`
-- Callback-based design for flexible hardware integration
-- Lightweight and suitable for Raspberry Pi
-- SDL2-based audio input and VAD support
-- Modular CMake-based build system
+- Whisper.cpp integration for local speech recognition
+- Custom text-to-code mapping using JSON configuration
+- Audio input through SDL2
+- VAD-based and timer-based recognition support
+- Hardware interaction via callback dispatch
 
-## Dependencies
-
-Install required packages (tested on Raspberry Pi OS / Ubuntu):
+## Build & Run
 
 ```bash
-sudo apt update
-sudo apt install -y cmake build-essential libsdl2-dev libasound2-dev libfftw3-dev
+cmake -B build -DWHISPER_SDL2=ON
+cmake --build build
 ```
 
-## Build and Run
-
-### Step 1: Download Whisper Model
-
-```bash
-mkdir -p models
-cd models
-wget https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en-q5_1.bin
-cd ..
-```
-
-You can replace the model file with others (tiny, small, medium) depending on speed versus accuracy tradeoff.
-
-### Step 2: Build the Project
-
-```bash
-cmake -B build -DWHISPER_SDL2=ON -DENABLE_GDB=OFF -S whisper.cpp
-cmake --build build --config Release
-```
-
-### Step 3: Run the Program
-
-#### Mode 1: VAD (Voice Activated)
-
-```bash
-./build/bin/whisper-fuzzy -u ./config.json -m ./whisper.cpp/models/ggml-base.en-q5_1.bin -t 6 --step 0 --length 3000 -vth 0.6
-```
-
-#### Mode 2: Periodic Recognition (Sliding Window)
-
-```bash
-./build/bin/whisper-fuzzy -u ./config.json -m ./whisper.cpp/models/ggml-base.en-q5_1.bin -t 6 --step 1000 --length 3000 -vth 0.6
-```
-
-## Configuration File: `config.json`
+## Example config.json
 
 ```json
 [
-  { "text": ["hello", "hi"], "code": "0x01" },
-  { "text": ["okay", "okay."], "code": "0x03" },
-  { "text": ["turn left"], "code": "0x10" }
+  { "text": ["stand up."], "code": "0x06" },
+  { "text": ["okay"], "code": "0x03" }
 ]
 ```
 
-## Included Libraries
-
-This project uses the following open-source components:
-
-- [whisper.cpp](https://github.com/ggerganov/whisper.cpp) — MIT License  
-  Used for on-device real-time speech recognition.
-
-- [nlohmann/json](https://github.com/nlohmann/json) — MIT License  
-  Single-header JSON parser used to load the command configuration.
-
-All third-party libraries remain under their respective licenses.
-
-## Model Disclaimer
-
-The Whisper models used in this project are developed and released by OpenAI.  
-Model binaries must be downloaded separately from:  
-https://huggingface.co/ggerganov/whisper.cpp
-
 ## License
 
-MIT License
-
-## Collaboration
-
-If you'd like to use or contribute to this project, feel free to fork, submit issues, or open pull requests.
+MIT License for original code. Third-party libraries retain their licenses.
