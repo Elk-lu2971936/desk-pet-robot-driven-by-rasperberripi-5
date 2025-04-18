@@ -1,6 +1,6 @@
 #include "debug.h"
 #include "whisper_fuzzy.h"
-#include "rotate180.h"   // 包含旋转舵机接口头文件
+#include "rotate180.h"   // Include the header file for servo rotation interface
 
 #include <iostream>
 #include <thread>
@@ -9,14 +9,14 @@
 #include <cstring>
 
 /**
- * Whisper 识别回调函数
- * 当匹配到：
- *   - code="0x06" 时，调用 rotateServo180() 使舵机旋转到 180°（standup）；
- *   - code="0x05" 时，调用 rotateServo0() 使舵机归位到 0°（sleep 模式）；
- *   - code="0x00" 时，交替执行：
- *         先使 GPIO12（舵机从 180° 到 90°）执行一次“向前”旋转，
- *         再使 GPIO13（舵机从 0° 到 180°）执行一次“向后”旋转，
- *         共循环 6 个周期。
+ * Whisper recognition callback function.
+ * When matched:
+ *   - code = "0x06": calls rotateServo180() to rotate the servo to 180° (standup);
+ *   - code = "0x05": calls rotateServo0() to return the servo to 0° (sleep mode);
+ *   - code = "0x00": performs alternating rotations:
+ *         First, GPIO12 moves the servo from 180° to 90° ("forward" rotation),
+ *         Then, GPIO13 moves the servo from 0° to 180° ("backward" rotation),
+ *         Repeats this cycle 6 times.
  */
 static int whisper_user_callback(size_t leat_count, const char *text, const char* code, void* userdata) {
     if (leat_count)
@@ -43,7 +43,7 @@ static int whisper_user_callback(size_t leat_count, const char *text, const char
 }
 
 /**
- * Whisper 任务线程
+ * Whisper task thread
  */
 void whisper_fuzzy_task(void* userdata) {
     whisper_fuzzy_t* w = (whisper_fuzzy_t*)userdata;
@@ -55,7 +55,7 @@ void whisper_fuzzy_task(void* userdata) {
 }
 
 /**
- * 主函数
+ * Main function
  */
 int main(int argc, char const* argv[]) {
     const int numThreads = 1;
