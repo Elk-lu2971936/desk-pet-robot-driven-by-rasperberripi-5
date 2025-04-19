@@ -17,7 +17,7 @@ This project implements a **desk pet robot** powered by Raspberry Pi 5 that can 
 ## ✨ Features
 
 - 🎙️ Voice or manual command control
-- ⚡ Real-time reaction (latency within milliseconds)
+- ⚡ Real-time reaction (Voice control is processed within 30ms, and servo/OLED control is completed within 60ms)
 - 🤖 Smooth motion via multi-threaded servo control
 - 🧠 Callback-based speech interpretation
 - 🖥️ OLED emoji feedback display
