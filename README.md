@@ -6,7 +6,7 @@ A real-time desktop pet robot driven by Raspberry Pi 5 with speech-controlled sm
 
 ## 📌 Project Overview
 
-This project implements a **desk pet robot** powered by Raspberry Pi 5 that can respond in **real-time** to both **voice** and **manual** commands like:
+This project implements a **desk pet robot** powered by Raspberry Pi 5 that can respond in **real-time** to both **voice**  commands like:
 
 - 🗣️ "Stand up"
 - 💤 "Sleep"
