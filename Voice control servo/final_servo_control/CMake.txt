@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.10)
+project(desk_pet_servo)
+
+# Use C++17 standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Add header file search paths
+include_directories(
+    ${CMAKE_SOURCE_DIR}
+)
+
+# Source files
+set(SOURCES
+    main.cpp
+    Servo.cpp
+    ServoController.cpp
+    oled_display.cpp
+    whisper_fuzzy.cpp
+)
+
+# Create the executable target
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+# Link libraries if necessary (e.g., gpiod for GPIO control)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GPIOD REQUIRED libgpiod)
+
+# Include and link GPIOD
+include_directories(${GPIOD_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${GPIOD_LIBRARIES})
+
+# Optionally add pthread if using threads (C++ standard needs this on some platforms)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} Threads::Threads)
